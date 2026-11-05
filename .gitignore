@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+lakehouse/
+spark-warehouse/
+metastore_db/
+derby.log
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+.user.yml
+.env
