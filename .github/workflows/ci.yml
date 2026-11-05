@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: src
+      LAKEHOUSE_ROOT: ${{ github.workspace }}/lakehouse
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Testes unitários (PySpark)
+        run: pytest -q
+
+      - name: Bronze + Silver (Delta Lake) com a amostra
+        run: python -m anp_lakehouse.pipeline --sample
+
+      - name: Reprocessamento idempotente (MERGE não duplica)
+        run: python -m anp_lakehouse.pipeline --sample
+
+      - name: Gold (dbt build = modelos + testes)
+        run: |
+          mkdir -p lakehouse/gold
+          cd dbt && dbt build --profiles-dir .
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build da imagem
+        run: docker build -t anp-lakehouse .
