@@ -1,0 +1,8 @@
+anp_gold:
+  target: local
+  outputs:
+    local:
+      type: duckdb
+      path: "{{ env_var('LAKEHOUSE_ROOT', '../lakehouse') }}/gold/anp.duckdb"
+      extensions: ["delta"]
+      threads: 4

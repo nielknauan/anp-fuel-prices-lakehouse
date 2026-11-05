@@ -1,0 +1,58 @@
+version: 2
+
+models:
+  - name: dim_produto
+    description: Produtos coletados pela ANP.
+    columns:
+      - name: produto_sk
+        data_tests: [unique, not_null]
+      - name: produto
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["GASOLINA", "GASOLINA ADITIVADA", "ETANOL", "DIESEL", "DIESEL S10", "GNV", "GLP"]
+
+  - name: dim_localidade
+    columns:
+      - name: localidade_sk
+        data_tests: [unique, not_null]
+      - name: uf
+        data_tests: [not_null]
+
+  - name: dim_revenda
+    description: Postos revendedores (CNPJ anonimizado via hash).
+    columns:
+      - name: revenda_sk
+        data_tests: [unique, not_null]
+
+  - name: dim_data
+    columns:
+      - name: data
+        data_tests: [unique, not_null]
+
+  - name: fct_preco_coleta
+    description: Um registro por revenda x produto x data de coleta.
+    columns:
+      - name: coleta_sk
+        data_tests: [unique, not_null]
+      - name: revenda_sk
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_revenda'), field: revenda_sk}
+      - name: produto_sk
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_produto'), field: produto_sk}
+      - name: localidade_sk
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_localidade'), field: localidade_sk}
+      - name: data
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_data'), field: data}
+      - name: valor_venda
+        data_tests: [not_null]
+
+  - name: agg_preco_medio_mensal_uf
+    description: Preço médio mensal por UF e produto (consumo em BI).

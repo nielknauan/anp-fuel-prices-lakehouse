@@ -1,0 +1,23 @@
+name: anp_gold
+version: "1.0.0"
+config-version: 2
+profile: anp_gold
+
+model-paths: ["models"]
+test-paths: ["tests"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  # Delta (padrão). Para ler os parquets direto: --vars '{silver_reader: parquet}'
+  silver_reader: delta
+  silver_path: "{{ env_var('LAKEHOUSE_ROOT', '../lakehouse') }}/silver/precos_combustiveis"
+
+models:
+  anp_gold:
+    staging:
+      +materialized: view
+      +schema: staging
+    marts:
+      +materialized: table
+      +schema: gold
