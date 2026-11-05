@@ -1,12 +1,11 @@
 FROM python:3.11-slim
 
-# Spark 4 precisa de Java 17+
+# Spark 4 roda em Java 17/21 (Debian 13 traz o 21)
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends openjdk-17-jre-headless make \
+    && apt-get install -y --no-install-recommends openjdk-21-jre-headless make \
     && rm -rf /var/lib/apt/lists/*
 
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 \
-    PYTHONPATH=/app/src \
+ENV PYTHONPATH=/app/src \
     LAKEHOUSE_ROOT=/app/lakehouse \
     PYTHONUNBUFFERED=1
 
